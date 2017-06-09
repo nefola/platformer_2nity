@@ -89,34 +89,32 @@ public class PlayerScript : MonoBehaviour
         }
         else
         {
-            grabHangAndClimbsScript.MovementUpdate();
-            if (grabHangAndClimbsScript.hangingState != GrabHangAndClimbScript.HangingState.NONE)
-            {
-                targetVelocity = new Vector2(0, 0);
-            }
+			if (grabHangAndClimbsScript != null) {
+				grabHangAndClimbsScript.MovementUpdate ();
+				if (grabHangAndClimbsScript.hangingState != GrabHangAndClimbScript.HangingState.NONE) {
+					targetVelocity = new Vector2 (0, 0);
+				}
+			}
         }
     }
 
     public void leftPressed()
     {
-        if (grabHangAndClimbsScript.hangingState == GrabHangAndClimbScript.HangingState.NONE)
-        {
+      
             targetVelocity.x = -horizontalSpeed;
-        }
+      
     }
 
     public void rightPressed()
     {
-        if (grabHangAndClimbsScript.hangingState == GrabHangAndClimbScript.HangingState.NONE)
-        {
+      
             targetVelocity.x = horizontalSpeed;
-        }
+        
     }
 
     public void upPressed()
     {
-        if (grabHangAndClimbsScript.hangingState == GrabHangAndClimbScript.HangingState.NONE)
-        {
+        
 
             if (movementControllerScript.isGrounded && movementControllerScript.isJumping == false)
             {
@@ -129,24 +127,19 @@ public class PlayerScript : MonoBehaviour
                 {
                     movementControllerScript.velocity += movementControllerScript.thingImStandingOn.GetComponent<MovementControllerScript>().velocity;
                     targetVelocity.x = movementControllerScript.velocity.x;
-                }
+                
             }
         }
-        else
-        {
-            grabHangAndClimbsScript.startClimbUp();
-        }
+       
     }
 
     public void downPressed()
-    {
-        if (grabHangAndClimbsScript.hangingState != GrabHangAndClimbScript.HangingState.NONE)
-        {
-            grabHangAndClimbsScript.drop();
-        }else
-        {
-            grabHangAndClimbsScript.ClimbDown();
-        }
-        
+	{if (grabHangAndClimbsScript != null) {
+			if (grabHangAndClimbsScript.hangingState != GrabHangAndClimbScript.HangingState.NONE) {
+				grabHangAndClimbsScript.drop ();
+			} else {
+				grabHangAndClimbsScript.ClimbDown ();
+			}
+		}
     }
 }

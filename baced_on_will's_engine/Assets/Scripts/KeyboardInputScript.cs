@@ -12,6 +12,10 @@ public class KeyboardInputScript : MonoBehaviour {
     KeyCode rightKey = KeyCode.D;
     KeyCode upKey = KeyCode.W;
     KeyCode downKey = KeyCode.S;
+    KeyCode leftKey2 = KeyCode.LeftArrow;
+    KeyCode rightKey2 = KeyCode.RightArrow;
+    KeyCode upKey2 = KeyCode.UpArrow;
+    KeyCode downKey2 = KeyCode.DownArrow;
     KeyCode pushKey = KeyCode.LeftShift;
 
 	// Use this for initialization
@@ -22,19 +26,19 @@ public class KeyboardInputScript : MonoBehaviour {
 	// Update is called once per frame
 	void LateUpdate () {
         i++;
-		if (Input.GetKey(leftKey))
+		if (Input.GetKey(leftKey) || Input.GetKey(leftKey2))
         {
             playerScript.leftPressed();
         }
-        if (Input.GetKey(rightKey))
+        if (Input.GetKey(rightKey) || Input.GetKey(rightKey2))
         {
             playerScript.rightPressed();
         }
-        if (Input.GetKey(upKey))
+        if (Input.GetKey(upKey) || Input.GetKey(upKey2))
         {
             playerScript.upPressed();
         }
-        if (Input.GetKey(downKey))
+        if (Input.GetKey(downKey) || Input.GetKey(downKey2))
         {
             playerScript.downPressed();
         }

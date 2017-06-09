@@ -72,7 +72,7 @@ public class MovementControllerScript : MonoBehaviour {
         {
             HandleSlope();
         }
-
+        transform.localScale = new Vector3(facing,1,1);
         totalMovedThisFrame += Move(amountLeftToMove);
         amountLeftToMove = velocity - totalMovedThisFrame;
     }
