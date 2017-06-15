@@ -2,53 +2,63 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class KeyboardInputScript : MonoBehaviour {
+
+    public List<KeyCode> upKeys;
+    public List<KeyCode> downKeys;
+    public List<KeyCode> lefKeys;
+    public List<KeyCode> rightKeys;
+    public List<KeyCode> pushKeys;
+
     PlayerScript playerScript;
 
-    int i = 0;
-
-    KeyCode leftKey = KeyCode.A;
-    KeyCode rightKey = KeyCode.D;
-    KeyCode upKey = KeyCode.W;
-    KeyCode downKey = KeyCode.S;
-    KeyCode leftKey2 = KeyCode.LeftArrow;
-    KeyCode rightKey2 = KeyCode.RightArrow;
-    KeyCode upKey2 = KeyCode.UpArrow;
-    KeyCode downKey2 = KeyCode.DownArrow;
-    KeyCode pushKey = KeyCode.LeftShift;
-
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         playerScript = GetComponent<PlayerScript>();
 	}
 	
 	// Update is called once per frame
 	void LateUpdate () {
-        i++;
-		if (Input.GetKey(leftKey) || Input.GetKey(leftKey2))
+		foreach (KeyCode code in upKeys)
         {
-            playerScript.leftPressed();
+            if (Input.GetKey(code))
+            {
+                playerScript.up();
+                break;
+            }
         }
-        if (Input.GetKey(rightKey) || Input.GetKey(rightKey2))
+        foreach (KeyCode code in lefKeys)
         {
-            playerScript.rightPressed();
+            if (Input.GetKey(code))
+            {
+                playerScript.left();
+                break;
+            }
         }
-        if (Input.GetKey(upKey) || Input.GetKey(upKey2))
+        foreach (KeyCode code in downKeys)
         {
-            playerScript.upPressed();
+            if (Input.GetKey(code))
+            {
+                playerScript.down();
+                break;
+            }
         }
-        if (Input.GetKey(downKey) || Input.GetKey(downKey2))
+        foreach (KeyCode code in rightKeys)
         {
-            playerScript.downPressed();
+            if (Input.GetKey(code))
+            {
+                playerScript.right();
+                break;
+            }
         }
-
-        playerScript.pushKeyPressed = Input.GetKey(pushKey);
-        if (i == 25)
+        playerScript.pushPressed = false;
+        foreach (KeyCode code in pushKeys)
         {
-            playerScript.downPressed();
-//            playerScript.pushKeyPressed = true;
-
+            if (Input.GetKey(code))
+            {
+                playerScript.pushPressed = true;
+                break;
+            }
         }
     }
 }

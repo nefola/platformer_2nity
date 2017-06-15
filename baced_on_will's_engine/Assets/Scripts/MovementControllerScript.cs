@@ -1,300 +1,363 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
-[RequireComponent(typeof(RaycasterScript))]
 public class MovementControllerScript : MonoBehaviour {
 
+    public LayerMask collisionLayer;
+    List<GameObject> gameObjectsToIgnoreCollisonsWith;
+    new BoxCollider2D collider;
+    public CollisionState collisionState;
+    public int horizontalRayCount;
+    public int verticalRayCount;
+    float horizontalRaySpacing;
+    float verticalRaySpacing;
+    public float skinWidth;
+    public List<GameObject> attachedObjects;
+    public List<GameObject> passengers;
 
-    public int facing = 1;
-    bool movedAlready;
-    public bool caresAboutSlopes;
-    public Vector2 amountLeftToMove;
-    public Vector2 totalMovedThisFrame;
-    public Vector2 baseAmountLeftToMove;
-    public float maxDescendableSlope;
-    public Vector2 prevVelocity;
-    public Vector2 baseVelocity;
-    public Vector2 targetBaseVelocity;
-    public Vector2 baseVelocityDif;
-    public Vector2 targetVelocity;
-    public Vector2 totalBaseMoveThisFrame;
-    public float descendAccelerationConstant = .5f;
-    public float maxAscendableSlope;
-    int count = 0;
-    float smallNum = .0001f;
-    public bool partialMove;
-    public bool isGrounded;
-    public bool isOnSlope;
 
-    MovementManagerScript movementManager;
-    public enum ControllerType {
-        PLAYER,
-        MOVING_PLATFORM,
-        BOX
-    }
-
-    public ControllerType controllerType;
-    public RaycasterScript raycasterScript;
-    public Vector2 velocity;
-    public PlayerScript playerScript;
-    public MovingPlatformScript movingPlatformScript;
-    public GameObject thingImStandingOn;
-    public bool isJumping;
-    public Vector2 prevBaseVelocity;
-    public Vector2 velocityDif;
-    
-	// Use this for initialization
-	void Start () {
-        movementManager = FindObjectOfType<MovementManagerScript>();
-        movementManager.movementControllers.Add(this);
-
-        movedAlready = false;
-        raycasterScript = GetComponent<RaycasterScript>();
-        velocity = new Vector2(0, 0);
-        baseVelocity = new Vector2(0, 0);
-        prevBaseVelocity = baseVelocity;
-
-        prevVelocity = velocity;
-        if (controllerType == ControllerType.PLAYER)
-        {
-            playerScript = GetComponent<PlayerScript>();
-        } else if (controllerType == ControllerType.MOVING_PLATFORM)
-        {
-            movingPlatformScript = GetComponent<MovingPlatformScript>();
-        }
-	}
-	
-    public void MovementUpdate()
+    public class CollisionState
     {
+        public Vector2 bottomLeft;
+        public Vector2 bottomRight;
+        public Vector2 topLeft;
+        public Vector2 topRight;
 
-        if (caresAboutSlopes  && !isJumping)
+        public List<RaycastHit2D> leftHits;
+        public List<RaycastHit2D> topHits;
+        public List<RaycastHit2D> bottomHits;
+        public List<RaycastHit2D> rightHits;
+
+       public void resetCollisions()
         {
-            HandleSlope();
+            leftHits = new List<RaycastHit2D>();
+            topHits = new List<RaycastHit2D>();
+            bottomHits = new List<RaycastHit2D>();
+            rightHits = new List<RaycastHit2D>();
         }
-        transform.localScale = new Vector3(facing,1,1);
-        totalMovedThisFrame += Move(amountLeftToMove);
-        amountLeftToMove = velocity - totalMovedThisFrame;
-    }
-
-    public void MovementSetup ()
-    {
-        isOnSlope = false;
-        raycasterScript.ResetRaycasterScript();
-        totalMovedThisFrame = new Vector2();
-        totalBaseMoveThisFrame = new Vector2();
-        amountLeftToMove = velocity;
-        baseAmountLeftToMove = baseVelocity;
-        if (Mathf.Abs(velocity.x) != 0)
+        public Vector2 getCorner(int x, int y)
         {
-            facing = (int)Mathf.Sign(velocity.x);
-        }
-    }
-
-    public void HandleSlope()
-    {
-        //        Vector2 HinitialVelocity = velocity;
-        if (Mathf.Abs(velocity.x) > .001){
-            HandleSlopeAscent(ref amountLeftToMove);
-        }
-        if (Mathf.Abs(baseVelocity.x) > .001)
-        {
-            HandleSlopeAscent(ref baseAmountLeftToMove);
-        }
-    }
-
-    public void BaseMoveUpdate()
-    {
-
-        totalBaseMoveThisFrame += Move(baseAmountLeftToMove);
-        baseAmountLeftToMove = baseVelocity - totalBaseMoveThisFrame;
-    }
-
-
-    public void MovementCleanup()
-    {
-        velocity = new Vector2(totalMovedThisFrame.x, velocity.y);
-        totalMovedThisFrame = new Vector2();
-        if (isGrounded)
-        {
-            Vector2 downVec = new Vector2(0, -1);
-            Move(downVec);
-        }
-        movedAlready = false;
-        isJumping = false;
-        prevVelocity = velocity;
-        prevBaseVelocity = baseVelocity;
-        baseVelocity = new Vector2();
-        raycasterScript.newCollisionsThisFrame = new List<GameObject>();
-    }
-
-
-    public Vector2 Move(Vector2 delta)
-    {
-            if (delta.x != 0)
+            if (x == -1 && y == -1)
             {
-                raycasterScript.HorizontalCollisions(ref delta);
+                return bottomLeft;
             }
-
-            if (delta.y != 0)
+            else if (x == -1 && y == 1)
             {
-                raycasterScript.VerticalCollisions(ref delta);
+                return topLeft;
             }
-
-        if (Mathf.Abs(delta.x) + Mathf.Abs(delta.y) > .001)
-        {
-            movementManager.somethingMoved = true;
+            else if (x == 1 && y == -1)
+            {
+                return bottomRight;
+            }
+            else if (x == 1 && y == 1)
+            {
+                return topRight;
+            }else
+            {
+                Debug.Log("INVALID CORNER");
+                return new Vector2(Mathf.Infinity, Mathf.Infinity);                
+            }
         }
-            transform.Translate(delta);
-            return delta;        
     }
 
     private void Update()
     {
-        thingImStandingOn = null;
+        collisionState.resetCollisions();
     }
 
-    void HandleSlopeAscent(ref Vector2 delta)
+    private void LateUpdate()
     {
-        float directionX = Mathf.Sign(delta.x);
-        Vector2 rayOrigin = (directionX == 1) ? raycasterScript.raycastOrigins.bottomRight : raycasterScript.raycastOrigins.bottomLeft;
+    //    attachedObjects = new List<GameObject>();
+    }
 
-        RaycastHit2D[] hits = Physics2D.RaycastAll(rayOrigin, Vector2.down, Mathf.Infinity, raycasterScript.collisionLayer);
+    // Use this for initialization
+    void Start () {
+        gameObjectsToIgnoreCollisonsWith = new List<GameObject>();
+        gameObjectsToIgnoreCollisonsWith.Add(gameObject);
+        attachedObjects = new List<GameObject>();
+        this.collisionState = new CollisionState();
+        collider = GetComponent<BoxCollider2D>();
+        calculateRaySpacing();
+        UpdateCollisionState();
+	}
 
-        RaycastHit2D hit = new RaycastHit2D();
-        float checkDistance = Mathf.Infinity;
-        bool goodHit = false;
+    void calculateRaySpacing()
+    {
+        horizontalRaySpacing = ((collider.bounds.extents.y) * 2) / (horizontalRayCount-1);
+        verticalRaySpacing = ((collider.bounds.extents.x) * 2) / (verticalRayCount-1);
+    }
 
-        foreach (RaycastHit2D testHit in hits)
+    void UpdateCollisionState()
+    {
+        collisionState.bottomLeft = collider.bounds.min;
+        collisionState.topRight = collider.bounds.max;
+        collisionState.bottomRight = new Vector2(collisionState.topRight.x, collisionState.bottomLeft.y);
+        collisionState.topLeft = new Vector2(collisionState.bottomLeft.x, collisionState.topRight.y);
+    }
+
+    public List<GameObject> FindPassengers()
+    {
+        List<RaycastHit2D> hits = VerticalRaycastHits(.001f);
+        passengers = new List<GameObject>();
+        foreach (RaycastHit2D hit in hits)
         {
-            if (!raycasterScript.gameObjectsIshouldIgnore.Contains(testHit.transform.gameObject)
-                && hit.distance < checkDistance)
+            if (hit.transform != null)
             {
-                hit = testHit;
-                checkDistance = hit.distance;
-                goodHit = true;
-            }
-        }
-
-        if (goodHit)
-        {
-            float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-            
-            if (slopeAngle != 0 && slopeAngle <= maxAscendableSlope)
-            {
-                if (Mathf.Sign(hit.normal.x) != directionX)
+                if (!passengers.Contains(hit.transform.gameObject))
                 {
-                    if (hit.distance - raycasterScript.skinWidth <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(delta.x))
-                    {
-                    //    float slopinessFactor = slopeAngle / maxDescendableSlope;
-                      //  Debug.Log("slopinessFactor = " + slopinessFactor);
-                //        float multiplier = 1 + slopinessFactor * descendAccelerationConstant;
-                  //      delta *= multiplier;
-                        float moveDistance = Mathf.Abs(delta.x);
-                        float descendVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
-                        //            delta.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(delta.x);
-                        //          delta.y += descendVelocityY;
-                        Vector2 newDelta = new Vector2(delta.x * Mathf.Cos(slopeAngle * Mathf.Deg2Rad), delta.x * Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * Mathf.Sign(delta.x));
-                            delta.x = newDelta.x;
-                        if (delta.y <= newDelta.y)
-                        {
-                            isGrounded = true;
-                            delta.y = newDelta.y;
-                            isOnSlope = true;
-                            raycasterScript.collisionState.descendingSlopeAngle = slopeAngle;
-                        }
-
-                        //                raycasterScript.collisionState.ascendingSlopeAngle = slopeAngle;
-                        //              raycasterScript.collisionState.descendingSlope = true;
-                    }
+                    passengers.Add(hit.transform.gameObject);
                 }
             }
         }
+        return passengers;
     }
 
-    /*
-        if (caresAboutSlopes)
+    List<RaycastHit2D> FindRaycastHits(Vector2 direction, float distance)
+    {
+      //UpdateCollisionState();
+        if (direction.y == 0)
         {
-            slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
+
+            return HorizontalRaycastHits(Mathf.Sign(direction.x)*distance);
+        }
+        else if (direction.x == 0)
+        {
+            return VerticalRaycastHits(Mathf.Sign(direction.y) * distance);
         }
         else
         {
-            //if we don't care about slopes we can just make the angle infinity then we never look at slope code
-            slopeAngle = Mathf.Infinity;
-        }*/
-
-        /*
-        //Handle Slope Ascending for vertical hit
-        if (delta.x != 0 && caresAboutSlopes)
-        {
-            if (collisionState.climbingSlope())
-            {
-                float theta;
-                if (delta.x < 0)
-                {
-                    theta = collisionState.slopeAngleLeft;
-                }
-                else
-                {
-                    theta = collisionState.slopeAngleRight;
-                }
-                if (theta != 0)
-                {
-                    delta.x = delta.y / Mathf.Tan(theta * Mathf.Deg2Rad) * Mathf.Sign(delta.x);
-                    //                                movementControllerScript.velocity.x = delta.x;
-                }
-            }
-        }
-        ///End slope ascending code
-        */
-    
-
-    void HandleSlopeDescent(ref Vector2 delta)
-    {
-        float directionX = Mathf.Sign(velocity.x);
-        Vector2 rayOrigin = (directionX == -1) ? raycasterScript.raycastOrigins.bottomRight : raycasterScript.raycastOrigins.bottomLeft;
-
-        RaycastHit2D[] hits = Physics2D.RaycastAll(rayOrigin, Vector2.down, Mathf.Infinity, raycasterScript.collisionLayer);
-
-        RaycastHit2D hit = new RaycastHit2D();
-        float checkDistance = Mathf.Infinity;
-        bool goodHit = false;
-
-        foreach (RaycastHit2D testHit in hits)
-        {
-            if (!raycasterScript.gameObjectsIshouldIgnore.Contains(testHit.transform.gameObject)
-                && hit.distance < checkDistance)
-            {
-                hit = testHit;
-                checkDistance = hit.distance;
-                goodHit = true;
-            }
-        }
-
-        if (goodHit)
-        {   
-            float slopeAngle = Vector2.Angle(hit.normal, Vector2.up);
-            if (slopeAngle != 0 && slopeAngle <= maxDescendableSlope)
-            {
-                if (Mathf.Sign(hit.normal.x) == directionX)
-                {
-                    if (hit.distance - raycasterScript.skinWidth <= Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(delta.x))
-                    {
-                        float slopinessFactor = slopeAngle/maxDescendableSlope;
-                        float multiplier = 1 + slopinessFactor*descendAccelerationConstant;
-                        delta *= multiplier;
-                        float moveDistance = Mathf.Abs(delta.x);
-                        float descendVelocityY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * moveDistance;
-                        delta.x = Mathf.Cos(slopeAngle * Mathf.Deg2Rad) * moveDistance * Mathf.Sign(delta.x);
-                        delta.y -= descendVelocityY;
-//                        isGrounded = true;
-
-                        raycasterScript.collisionState.descendingSlopeAngle = slopeAngle;
-                        raycasterScript.collisionState.descendingSlope = true;
-                    }
-                }
-            }
+            //can only do 1 dimension at a time
+            Debug.Log("Invalid direction");
+            return null;
         }
     }
 
+    public List<RaycastHit2D> HorizontalRaycastHits(float distance)
+    {
+        if (distance > 0)
+        {
+            collisionState.bottomRight = new Vector2(collider.bounds.max.x, collider.bounds.min.y);
+        }else if (distance < 0)
+        {
+            collisionState.bottomLeft = collider.bounds.min;
+        }
+        else { 
+            return null;
+        }
+            int direction = (int)Mathf.Sign(distance);
+            List<RaycastHit2D> horizontalHits = new List<RaycastHit2D>(horizontalRayCount);
+            Vector2 corner = collisionState.getCorner(direction, -1);
+            for (int i = 0; i < horizontalRayCount; i++)
+            {
+                Vector2 rayOrigin = new Vector2(corner.x, horizontalRaySpacing * i + corner.y);
+                if (i == 0)
+                {
+                    rayOrigin.y += skinWidth;
+                }
+                if (i == horizontalRayCount - 1)
+                {
+                    rayOrigin.y -= skinWidth;
+                 }
+            horizontalHits.Add(ObstacleRaycast(rayOrigin, new Vector2(distance, 0), Mathf.Abs(distance)));
+
+        }
+        return horizontalHits;
+    }
+
+
+    public List<RaycastHit2D> VerticalRaycastHits(float distance)
+    {
+        if (distance < 0)
+        {
+            collisionState.bottomLeft = collider.bounds.min;
+        }else if (distance > 0)
+        {
+            collisionState.topLeft = new Vector2(collider.bounds.min.x, collider.bounds.max .y);
+        }
+        else
+        {
+            return null;
+        }
+        
+            int direction = (int) Mathf.Sign(distance);
+            List<RaycastHit2D> verticalHits = new List<RaycastHit2D>(verticalRayCount);
+            Vector2 corner = collisionState.getCorner(-1, direction);
+
+            for (int i = 0; i < verticalRayCount; i++)
+            {
+                Vector2 rayOrigin = new Vector2(corner.x + verticalRaySpacing * i, corner.y);
+                if (i == 0)
+                {
+                    rayOrigin.x += skinWidth;
+                }
+                if (i == verticalRayCount - 1)
+                {
+                    rayOrigin.x -= skinWidth;
+                }
+           
+                verticalHits.Add(ObstacleRaycast(rayOrigin, new Vector2(0,distance), Mathf.Abs(distance)));
+            }
+            return verticalHits;
+        
+    }
+
+    RaycastHit2D ObstacleRaycast(Vector2 origin, Vector2 direction, float distance) {
+        RaycastHit2D goodHit = new RaycastHit2D();
+        RaycastHit2D[] allHits = Physics2D.RaycastAll(origin, direction * distance, collisionLayer);
+        float checkDistance = distance;
+        foreach (RaycastHit2D hit in allHits)
+        {
+            if (hit.transform != null)
+            {
+                if (hit.distance <= checkDistance && !gameObjectsToIgnoreCollisonsWith.Contains(hit.transform.gameObject))
+                {
+                    goodHit = hit;
+                    checkDistance = hit.distance;
+                }
+            }
+        }
+ 
+        return goodHit;
+    }
+
+    public Vector2 Move(Vector2 delta)
+    {
+        Vector2 amountMoved;
+        if (attachedObjects.Count > 0)
+        {
+
+            amountMoved = MoveWithGameObjects(delta, attachedObjects);
+        }
+        else
+        {
+
+            //Move attempts to move in the x dimension and then the y
+            //it only moves us as far as we can move, and returns however far that was
+
+            Vector2 newDelta = new Vector2(delta.x, delta.y);
+            if (delta.x != 0)
+            {
+                newDelta.x = CalculateMoveX(delta);
+            }
+            if (delta.y != 0)
+            {
+                newDelta.y = CalculateMoveY(delta);
+            }
+            amountMoved = newDelta;
+            transform.Translate(newDelta);
+        }
+
+        foreach (GameObject passenger in passengers)
+        {
+            MovementControllerScript mcs = passenger.GetComponent<MovementControllerScript>();
+            if (mcs != null)
+            {
+                mcs.Move(amountMoved);
+            }
+        }
+        return amountMoved;
+    }
+
+    public float CalculateMoveX(Vector2 delta)
+    {
+        float direction = Mathf.Sign(delta.x);
+        List<RaycastHit2D> hits = HorizontalRaycastHits(delta.x);
+        if (direction < 0)
+        {
+            collisionState.leftHits = hits;
+        }else
+        {
+            collisionState.rightHits = hits;
+        }
+
+        float distance = Mathf.Abs(delta.x);
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.transform != null)
+            {
+                if (hit.distance < distance)
+                {
+                    distance = hit.distance;
+                }
+            }
+        }
+        return distance*direction;
+    }
+
+    public float CalculateMoveY(Vector2 delta)
+    {
+        float direction = Mathf.Sign(delta.y);
+        List<RaycastHit2D> hits = VerticalRaycastHits(delta.y);
+        if (direction < 0)
+        {
+            collisionState.bottomHits = hits;
+        }
+        else
+        {
+            collisionState.topHits = hits;
+        }
+        float distance = (Mathf.Abs(delta.y));
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.transform != null)
+            {
+                if (hit.distance < distance)
+                {
+                    distance = hit.distance;
+                }
+            }
+        }
+        return distance * direction;
+    }
+
+    public Vector2 MoveWithGameObjects(Vector2 delta, List<GameObject> attachedObjects)
+    {
+        gameObjectsToIgnoreCollisonsWith.AddRange(attachedObjects);
+        Vector2 newDelta = new Vector2(delta.x, delta.y);
+        if (delta.x != 0)
+        {
+            newDelta.x = CalculateMoveX(delta);
+        }
+        if (delta.y != 0)
+        {
+            newDelta.y = CalculateMoveY(delta);
+        }
+
+        foreach (GameObject go in attachedObjects)
+        {
+            MovementControllerScript mcs = go.GetComponent<MovementControllerScript>();
+            mcs.gameObjectsToIgnoreCollisonsWith.Add(gameObject);
+            Vector2 objectDelta = new Vector2(0, 0);
+            if (delta.x != 0)
+            {
+                objectDelta.x = mcs.CalculateMoveX(delta);
+            }
+            if (delta.y != 0)
+            {
+                objectDelta.y = mcs.CalculateMoveY(delta);
+            }
+
+            if (Mathf.Abs(objectDelta.x) < Mathf.Abs(newDelta.x))
+            {
+                newDelta.x = objectDelta.x;
+            }
+            if (Mathf.Abs(objectDelta.y) < Mathf.Abs(newDelta.y))
+            {
+                newDelta.y = objectDelta.y;
+            }
+        }
+        
+        foreach(GameObject go in attachedObjects)
+        {
+            MovementControllerScript mcs = go.GetComponent<MovementControllerScript>();
+            mcs.gameObjectsToIgnoreCollisonsWith.Remove(gameObject);
+            go.transform.Translate(newDelta);
+        }
+
+        gameObjectsToIgnoreCollisonsWith = gameObjectsToIgnoreCollisonsWith.Except<GameObject>(attachedObjects).ToList<GameObject>();
+        transform.Translate(newDelta);
+        return newDelta;
+    }
 }
