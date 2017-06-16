@@ -8,7 +8,7 @@ public class PlayerScript : MonoBehaviour {
     PhysicsScript physicsScript;
     public float speed;
     public float jumpVelocity;
-    public int airJumps = 1;
+    public int airJumps = 2;
     public int framesSinceLastJump;
     public int jumpCooldown = 10;
     public int maxAirJumps = 2;
@@ -66,7 +66,7 @@ public class PlayerScript : MonoBehaviour {
     }
     public void up()
     {
-        if (physicsScript.onGround && framesSinceLastJump > jumpCooldown)
+        if (physicsScript.onGround)
         {
             physicsScript.velocity.y = jumpVelocity;
             framesSinceLastJump = 0;
