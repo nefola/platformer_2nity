@@ -10,7 +10,7 @@ public class PlayerScript : MonoBehaviour {
     public float jumpVelocity;
     public int airJumps = 1;
     public int framesSinceLastJump;
-    public int jumpCooldown;
+    public int jumpCooldown = 10;
     public int maxAirJumps = 2;
     int facing;
     GraberScript graberScript;
