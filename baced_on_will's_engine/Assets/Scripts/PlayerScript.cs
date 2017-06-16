@@ -8,6 +8,10 @@ public class PlayerScript : MonoBehaviour {
     PhysicsScript physicsScript;
     public float speed;
     public float jumpVelocity;
+    public int airJumps = 1;
+    public int framesSinceLastJump;
+    public int jumpCooldown;
+    public int maxAirJumps = 2;
     int facing;
     GraberScript graberScript;
     MovementControllerScript movementControllerScript;
@@ -25,7 +29,7 @@ public class PlayerScript : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         sprite.flipX = (facing == -1);
-      
+        framesSinceLastJump++;      
         PushMovement();
        
     }
@@ -62,9 +66,16 @@ public class PlayerScript : MonoBehaviour {
     }
     public void up()
     {
-        if (physicsScript.onGround)
+        if (physicsScript.onGround && framesSinceLastJump > jumpCooldown)
         {
             physicsScript.velocity.y = jumpVelocity;
+            framesSinceLastJump = 0;
+            airJumps = maxAirJumps;
+        }else if (airJumps > 0 && framesSinceLastJump > jumpCooldown)
+        {
+            physicsScript.velocity.y = jumpVelocity;
+            framesSinceLastJump = 0;
+            airJumps--;
         }
     }
     public void down()

@@ -33,17 +33,21 @@ public class GraberScript : MonoBehaviour {
 
     public void StartGrabing(List<GameObject> objects)
     {
-        StopGrabing();
-        foreach (GameObject go in objects)
+        //        StopGrabing();
+        if (thingIAmGrabing == null)
         {
-            if (go.GetComponent<GrabableScript>() != null)
+            foreach (GameObject go in objects)
             {
-                if (!movementControllerScript.attachedObjects.Contains(go))
+                if (go.GetComponent<GrabableScript>() != null)
                 {
-                    thingIAmGrabing = go;
-                    movementControllerScript.attachedObjects.Add(go);
-                    go.GetComponent<PhysicsScript>().affectedByGravity = false;
-                    break;
+                    if (!movementControllerScript.attachedObjects.Contains(go))
+                    {
+                        thingIAmGrabing = go;
+                        movementControllerScript.attachedObjects.Add(go);
+                        go.GetComponent<PhysicsScript>().affectedByGravity = false;
+                        go.transform.position = transform.position;
+                        break;
+                    }
                 }
             }
         }
@@ -54,6 +58,7 @@ public class GraberScript : MonoBehaviour {
         movementControllerScript.attachedObjects.Remove(thingIAmGrabing);
         if(thingIAmGrabing != null){
             thingIAmGrabing.GetComponent<PhysicsScript>().affectedByGravity = true;
+            thingIAmGrabing.transform.Translate(new Vector2(0, 2));
         }
         thingIAmGrabing = null;
     }

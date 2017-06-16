@@ -10,6 +10,7 @@ public class PhysicsScript : MonoBehaviour {
     //this is the velocity of the object -- it persists and is modified from frame to frame
     public Vector2 velocity;
     public bool onGround = false;
+    public bool onCeiling = false;
     public bool affectedByGravity = true;
     public float gravity;
     public float groundFriction;
@@ -31,6 +32,7 @@ public class PhysicsScript : MonoBehaviour {
         }
         movementControllerScript.Move(velocity);
         onGround = checkIfGrounded();
+        onCeiling = checkIfCeilinged();
         if (onGround)
         {
             velocity.y = 0;
@@ -40,11 +42,26 @@ public class PhysicsScript : MonoBehaviour {
         {
             velocity.x *= (1-airFriction);
         }
+        if (onCeiling)
+        {
+            velocity.y = 0;
+        }
     }
 
     bool checkIfGrounded()
     {
         foreach (RaycastHit2D hit in movementControllerScript.collisionState.bottomHits)
+        {
+            if (hit.transform != null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    bool checkIfCeilinged()
+    {
+        foreach (RaycastHit2D hit in movementControllerScript.collisionState.topHits)
         {
             if (hit.transform != null)
             {
