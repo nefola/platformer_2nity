@@ -8,9 +8,9 @@ public class PlayerScript : MonoBehaviour {
     PhysicsScript physicsScript;
     public float speed;
     public float jumpVelocity;
-    public int jumps = 2;
+    public int jumps;
     public int framesSinceLastJump;
-    public int jumpCooldown = 15;
+    public int jumpCooldown = 9;
     public int maxJumps = 2;
     int facing;
     GraberScript graberScript;
@@ -37,7 +37,7 @@ public class PlayerScript : MonoBehaviour {
             jumps = maxJumps;
         }
 
-        speed = speed * 0.0005f;
+        speed = speed * 0.000000001f;
     }
 
     public void PushMovement()
@@ -57,9 +57,9 @@ public class PlayerScript : MonoBehaviour {
     public void left()
     {
         //physicsScript.velocity.x = -speed;
-        if (physicsScript.velocity.x < -75)
+        if (physicsScript.velocity.x > -1.6)
         {
-            physicsScript.velocity.x--;
+            physicsScript.velocity.x = physicsScript.velocity.x - 0.05f;
         }
             if (!pushPressed)
         {
@@ -69,9 +69,9 @@ public class PlayerScript : MonoBehaviour {
     public void right()
     {
         //physicsScript.velocity.x = speed;
-        if (physicsScript.velocity.x > 75)
+        if (physicsScript.velocity.x < 1.6)
         {
-            physicsScript.velocity.x++;
+            physicsScript.velocity.x = physicsScript.velocity.x + 0.05f;
         }
         if (!pushPressed)
         {
@@ -80,17 +80,18 @@ public class PlayerScript : MonoBehaviour {
     }
     public void up()
     {
-        if (physicsScript.onGround && framesSinceLastJump > jumpCooldown)
+      // if (physicsScript.onGround && framesSinceLastJump > jumpCooldown)
+       // {
+       //     physicsScript.velocity.y = jumpVelocity;
+         //   framesSinceLastJump = 0;
+           // jumps = jumps -1;
+       // }
+//        else
+ if (jumps > 0 && framesSinceLastJump > jumpCooldown)
         {
             physicsScript.velocity.y = jumpVelocity;
             framesSinceLastJump = 0;
-            jumps--;
-        }
-        else if (jumps > 0 && framesSinceLastJump > jumpCooldown)
-        {
-            physicsScript.velocity.y = jumpVelocity;
-            framesSinceLastJump = 0;
-            jumps--;
+            jumps = jumps -1;
         }
     }
     public void down()
