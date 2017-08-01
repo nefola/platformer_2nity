@@ -239,14 +239,17 @@ public class MovementControllerScript : MonoBehaviour {
             Vector2 newDelta = new Vector2(delta.x, delta.y);
             if (delta.x != 0)
             {
+                UpdateCollisionState();
                 newDelta.x = CalculateMoveX(delta);
             }
+            transform.Translate(new Vector2(newDelta.x,0));
             if (delta.y != 0)
             {
+                UpdateCollisionState();
                 newDelta.y = CalculateMoveY(delta);
             }
             amountMoved = newDelta;
-            transform.Translate(newDelta);
+            transform.Translate(new Vector2(0,newDelta.y));
         }
 
         foreach (GameObject passenger in passengers)
