@@ -12,6 +12,7 @@ public class PlayerScript : MonoBehaviour {
     public int framesSinceLastJump;
     public int jumpCooldown = 9;
     public int maxJumps = 2;
+    public float speedLimit = 1.5f;
     int facing;
     GraberScript graberScript;
     MovementControllerScript movementControllerScript;
@@ -37,7 +38,7 @@ public class PlayerScript : MonoBehaviour {
             jumps = maxJumps;
         }
 
-        speed = speed * 0.000000001f;
+        speed = speed * 0.0000000007f;
     }
 
     public void PushMovement()
@@ -57,7 +58,7 @@ public class PlayerScript : MonoBehaviour {
     public void left()
     {
         //physicsScript.velocity.x = -speed;
-        if (physicsScript.velocity.x > -1.6)
+        if (physicsScript.velocity.x > -speedLimit)
         {
             physicsScript.velocity.x = physicsScript.velocity.x - 0.05f;
         }
@@ -69,7 +70,7 @@ public class PlayerScript : MonoBehaviour {
     public void right()
     {
         //physicsScript.velocity.x = speed;
-        if (physicsScript.velocity.x < 1.6)
+        if (physicsScript.velocity.x < speedLimit)
         {
             physicsScript.velocity.x = physicsScript.velocity.x + 0.05f;
         }

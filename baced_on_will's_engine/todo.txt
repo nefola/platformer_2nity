@@ -1,1 +1,4 @@
--fix air jumps
+-key binding
+	-rebind defaults
+-add dash
+-add speed based camera zoom
