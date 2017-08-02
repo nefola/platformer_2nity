@@ -1,4 +1,5 @@
 -key binding
 	-rebind defaults
 -add dash
--add speed based camera zoom
+-add fast fall/ground pound
+—add power

@@ -38,7 +38,8 @@ public class PlayerScript : MonoBehaviour {
             jumps = maxJumps;
         }
 
-        speed = speed * 0.0000000007f;
+        speed = speed * 0.0000000007f; //this creates friction
+
     }
 
     public void PushMovement()
