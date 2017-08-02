@@ -10,7 +10,11 @@ public class PlayerScript : MonoBehaviour {
     public float jumpVelocity;
     public int jumps;
     public int framesSinceLastJump;
+	public int framesSinceLastDash;
+	public bool amDashing = false;
+	public int beenDashing;
     public int jumpCooldown = 9;
+	public int dashCooldown = 60;
     public int maxJumps = 2;
     public float speedLimit = 1.5f;
     int facing;
@@ -32,13 +36,24 @@ public class PlayerScript : MonoBehaviour {
         sprite.flipX = (facing == -1);
         framesSinceLastJump++;      
         PushMovement();
-        Debug.Log(framesSinceLastJump);
+//        Debug.Log(framesSinceLastJump);
         if (physicsScript.onGround)
         {
             jumps = maxJumps;
         }
-
-        speed = speed * 0.0000000007f; //this creates friction
+		if (amDashing == true) {
+			physicsScript.affectedByFriction = false;
+			physicsScript.affectedByGravity = false;
+			beenDashing++;
+			if (beenDashing > 10) {
+				physicsScript.affectedByFriction = true;
+				physicsScript.affectedByGravity = true;
+				amDashing = false;
+			}
+		} else {
+			framesSinceLastDash++;
+		}
+        //speed = speed * 0.0000000007f; //this creates friction
 
     }
 
@@ -80,7 +95,21 @@ public class PlayerScript : MonoBehaviour {
             facing = 1;
         }
     }
-    public void up()
+	public void dash()
+	{
+		Debug.Log("try dash");
+		if (framesSinceLastDash > dashCooldown && physicsScript.onGround) {
+			Debug.Log("dash!");
+			physicsScript.velocity.x = 1.6f * facing;
+			amDashing = true;
+			framesSinceLastDash = 0;
+		}
+	}
+	public void power()
+	{
+		
+	}
+    public void jump()
     {
       // if (physicsScript.onGround && framesSinceLastJump > jumpCooldown)
        // {

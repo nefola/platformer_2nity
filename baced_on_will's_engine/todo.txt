@@ -1,5 +1,2 @@
--key binding
-	-rebind defaults
--add dash
 -add fast fall/ground pound
 —add power

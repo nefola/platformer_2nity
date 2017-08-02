@@ -12,6 +12,7 @@ public class PhysicsScript : MonoBehaviour {
     public bool onGround = false;
     public bool onCeiling = false;
     public bool affectedByGravity = true;
+	public bool affectedByFriction = true;
     public float gravity;
     public float groundFriction;
     public float airFriction;
@@ -33,15 +34,14 @@ public class PhysicsScript : MonoBehaviour {
         movementControllerScript.Move(velocity);
         onGround = checkIfGrounded();
         onCeiling = checkIfCeilinged();
-        if (onGround)
-        {
-            velocity.y = 0;
-            velocity.x *= (1-groundFriction);
-        }
-        else
-        {
-            velocity.x *= (1-airFriction);
-        }
+		if (affectedByFriction) {
+			if (onGround) {
+				velocity.y = 0;
+				velocity.x *= (1 - groundFriction);
+			} else {
+				velocity.x *= (1 - airFriction);
+			}
+		}
         if (onCeiling)
         {
             velocity.y = 0;

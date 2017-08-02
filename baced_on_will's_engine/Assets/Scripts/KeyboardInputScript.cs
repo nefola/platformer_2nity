@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class KeyboardInputScript : MonoBehaviour {
 
-    public List<KeyCode> upKeys;
+    public List<KeyCode> jumpKeys;
     public List<KeyCode> downKeys;
-    public List<KeyCode> lefKeys;
+    public List<KeyCode> leftKeys;
     public List<KeyCode> rightKeys;
     public List<KeyCode> pushKeys;
+	public List<KeyCode> dashKeys;
+	public List<KeyCode> powerKeys;
 
     PlayerScript playerScript;
 
@@ -19,15 +21,31 @@ public class KeyboardInputScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void LateUpdate () {
-		foreach (KeyCode code in upKeys)
+		foreach (KeyCode code in jumpKeys)
         {
             if (Input.GetKey(code))
             {
-                playerScript.up();
+                playerScript.jump();
                 break;
             }
         }
-        foreach (KeyCode code in lefKeys)
+		foreach (KeyCode code in dashKeys)
+		{
+			if (Input.GetKey(code))
+			{
+				playerScript.dash();
+				break;
+			}
+		}
+		foreach (KeyCode code in powerKeys)
+		{
+			if (Input.GetKey(code))
+			{
+				playerScript.power();
+				break;
+			}
+		}
+        foreach (KeyCode code in leftKeys)
         {
             if (Input.GetKey(code))
             {
