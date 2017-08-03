@@ -11,7 +11,9 @@ public class PlayerScript : MonoBehaviour {
     public int jumps;
     public int framesSinceLastJump;
 	public int framesSinceLastDash;
+	public int framesframesSinceLastFlutter;
 	public bool amDashing = false;
+	public bool amFluttering = false;
 	public int beenDashing;
     public int jumpCooldown = 9;
 	public int dashCooldown = 60;
@@ -102,6 +104,10 @@ public class PlayerScript : MonoBehaviour {
 		}
 	}
 	public void power()
+	{
+		
+	}
+	public void flutter()
 	{
 		
 	}

@@ -6,6 +6,7 @@ public class KeyboardInputScript : MonoBehaviour {
 
     public List<KeyCode> jumpKeys;
     public List<KeyCode> downKeys;
+	public List<KeyCode> flutterKeys;
     public List<KeyCode> leftKeys;
     public List<KeyCode> rightKeys;
     public List<KeyCode> pushKeys;
@@ -29,6 +30,14 @@ public class KeyboardInputScript : MonoBehaviour {
                 break;
             }
         }
+		foreach (KeyCode code in flutterKeys)
+		{
+			if (Input.GetKey(code))
+			{
+				playerScript.flutter();
+				break;
+			}
+		}
 		foreach (KeyCode code in dashKeys)
 		{
 			if (Input.GetKey(code))
