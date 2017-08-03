@@ -33,7 +33,7 @@ public class PlayerScript : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        sprite.flipX = (facing == -1);
+        sprite.flipX = (facing == -1); //very smart
         framesSinceLastJump++;      
         PushMovement();
 //        Debug.Log(framesSinceLastJump);
@@ -76,33 +76,29 @@ public class PlayerScript : MonoBehaviour {
         //physicsScript.velocity.x = -speed;
         if (physicsScript.velocity.x > -speedLimit)
         {
-            physicsScript.velocity.x = physicsScript.velocity.x - 0.05f;
+            physicsScript.velocity.x = physicsScript.velocity.x - 0.025f;
         }
-            if (!pushPressed)
-        {
+           
             facing = -1;
-        }
     }
     public void right()
     {
         //physicsScript.velocity.x = speed;
         if (physicsScript.velocity.x < speedLimit)
         {
-            physicsScript.velocity.x = physicsScript.velocity.x + 0.05f;
+            physicsScript.velocity.x = physicsScript.velocity.x + 0.025f;
         }
-        if (!pushPressed)
-        {
             facing = 1;
-        }
     }
 	public void dash()
 	{
 		Debug.Log("try dash");
 		if (framesSinceLastDash > dashCooldown && physicsScript.onGround) {
 			Debug.Log("dash!");
-			physicsScript.velocity.x = 1.6f * facing;
 			amDashing = true;
+			physicsScript.velocity.x = 1.6f * facing;
 			framesSinceLastDash = 0;
+			beenDashing = 0;
 		}
 	}
 	public void power()
@@ -127,6 +123,6 @@ public class PlayerScript : MonoBehaviour {
     }
     public void down()
     {
-
+		physicsScript.velocity.y -= 0.03f;
     }
 }
