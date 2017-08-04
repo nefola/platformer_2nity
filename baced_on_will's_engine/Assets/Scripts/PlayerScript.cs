@@ -9,20 +9,25 @@ public class PlayerScript : MonoBehaviour {
     public float speed;
     public float jumpVelocity;
     public int jumps;
+	public int flutters;
     public int framesSinceLastJump;
 	public int framesSinceLastDash;
 	public int framesframesSinceLastFlutter;
-	public bool amDashing = false;
 	public bool amFluttering = false;
+	public bool amDashing = false;
+	public bool attemptFluttering = false;
 	public int beenDashing;
+	public int beenFluttering;
     public int jumpCooldown = 9;
 	public int dashCooldown = 60;
     public int maxJumps = 2;
+	public int maxFlutters = 1;
     public float speedLimit = 1.5f;
     int facing;
     GraberScript graberScript;
     MovementControllerScript movementControllerScript;
     SpriteRenderer sprite;
+	KeyboardInputScript inputScript;
     // Use this for initialization
 
     void Start() {
@@ -30,6 +35,7 @@ public class PlayerScript : MonoBehaviour {
         sprite = GetComponent<SpriteRenderer>();
         graberScript = GetComponent<GraberScript>();
         movementControllerScript = GetComponent<MovementControllerScript>();
+		inputScript = GetComponent<KeyboardInputScript>();
         facing = 1;
     }
 
@@ -42,6 +48,7 @@ public class PlayerScript : MonoBehaviour {
         if (physicsScript.onGround)
         {
             jumps = maxJumps;
+			flutters = maxFlutters;
         }
 		if (amDashing == true) {
 			physicsScript.affectedByFriction = false;
@@ -55,8 +62,10 @@ public class PlayerScript : MonoBehaviour {
 		} else {
 			framesSinceLastDash++;
 		}
+		flutter();
+		Debug.Log (attemptFluttering);
+		Debug.Log (amFluttering);
         //speed = speed * 0.0000000007f; //this creates friction
-
     }
 
     public void PushMovement()
@@ -109,17 +118,23 @@ public class PlayerScript : MonoBehaviour {
 	}
 	public void flutter()
 	{
-		
+		if (physicsScript.onGround == false && attemptFluttering == true && flutters > 0) {
+			amFluttering = true;
+			flutters--;
+		}
+		if (amFluttering == true){
+		physicsScript.affectedByGravity = false;
+			beenFluttering++;
+			physicsScript.velocity.y = 0;
+			if (beenFluttering > 60 || attemptFluttering == false) {
+				amFluttering = false;
+				physicsScript.affectedByGravity = true;
+
+		} 
+	}
 	}
     public void jump()
     {
-      // if (physicsScript.onGround && framesSinceLastJump > jumpCooldown)
-       // {
-       //     physicsScript.velocity.y = jumpVelocity;
-         //   framesSinceLastJump = 0;
-           // jumps = jumps -1;
-       // }
-//        else
  if (jumps > 0 && framesSinceLastJump > jumpCooldown)
         {
             physicsScript.velocity.y = jumpVelocity;

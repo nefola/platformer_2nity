@@ -32,10 +32,10 @@ public class KeyboardInputScript : MonoBehaviour {
         }
 		foreach (KeyCode code in flutterKeys)
 		{
-			if (Input.GetKey(code))
-			{
-				playerScript.flutter();
-				break;
+			if (Input.GetKey (code) && playerScript.flutters > 0) {
+				playerScript.attemptFluttering = true;
+			} else {
+				playerScript.attemptFluttering = false;
 			}
 		}
 		foreach (KeyCode code in dashKeys)
@@ -87,5 +87,5 @@ public class KeyboardInputScript : MonoBehaviour {
                 break;
             }
         }
-    }
+	}
 }

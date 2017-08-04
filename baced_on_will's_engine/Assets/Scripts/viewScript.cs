@@ -35,6 +35,6 @@ public class viewScript : MonoBehaviour {
 			camera.orthographicSize = currentViewSize;
 		
 		}
-		Debug.Log(lockCamera);
+
 	}
 }
