@@ -30,14 +30,14 @@ public class KeyboardInputScript : MonoBehaviour {
                 break;
             }
         }
-		foreach (KeyCode code in flutterKeys)
-		{
-			if (Input.GetKey (code) && playerScript.flutters > 0) {
-				playerScript.attemptFluttering = true;
-			} else {
-				playerScript.attemptFluttering = false;
-			}
-		}
+        playerScript.flutteringHeld = false;
+        foreach (KeyCode code in flutterKeys)
+        {
+            if (Input.GetKey(code) ) {
+                playerScript.flutteringHeld = true;
+                break;
+            }
+        }
 		foreach (KeyCode code in dashKeys)
 		{
 			if (Input.GetKey(code))

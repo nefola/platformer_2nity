@@ -15,7 +15,7 @@ public class PlayerScript : MonoBehaviour {
 	public int framesframesSinceLastFlutter;
 	public bool amFluttering = false;
 	public bool amDashing = false;
-	public bool attemptFluttering = false;
+	public bool flutteringHeld = false;
 	public int beenDashing;
 	public int beenFluttering;
     public int jumpCooldown = 9;
@@ -63,7 +63,7 @@ public class PlayerScript : MonoBehaviour {
 			framesSinceLastDash++;
 		}
 		flutter();
-		Debug.Log (attemptFluttering);
+		Debug.Log (flutteringHeld);
 		Debug.Log (amFluttering);
         //speed = speed * 0.0000000007f; //this creates friction
     }
@@ -118,7 +118,7 @@ public class PlayerScript : MonoBehaviour {
 	}
 	public void flutter()
 	{
-		if (physicsScript.onGround == false && attemptFluttering == true && flutters > 0) {
+		if (physicsScript.onGround == false && flutteringHeld == true && flutters > 0) {
 			amFluttering = true;
 			flutters--;
 		}
@@ -126,9 +126,10 @@ public class PlayerScript : MonoBehaviour {
 		physicsScript.affectedByGravity = false;
 			beenFluttering++;
 			physicsScript.velocity.y = 0;
-			if (beenFluttering > 60 || attemptFluttering == false) {
+			if (beenFluttering > 60 || flutteringHeld == false) {
 				amFluttering = false;
 				physicsScript.affectedByGravity = true;
+                beenFluttering = 0;
 
 		} 
 	}
