@@ -23,6 +23,8 @@ public class PlayerScript : MonoBehaviour {
     public int maxJumps = 2;
 	public int maxFlutters = 1;
     public float speedLimit = 1.5f;
+    public int health = 50;
+    public int maxHealth = 50;
     int facing;
     GraberScript graberScript;
     MovementControllerScript movementControllerScript;

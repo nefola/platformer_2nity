@@ -11,6 +11,7 @@ public class viewScript : MonoBehaviour {
 	PhysicsScript physicsScript;
 	PlayerScript playerScript;
 	public GameObject player;
+    public GameObject menu;
 	public Camera camera;
 	// Use this for initialization
 
@@ -35,6 +36,7 @@ public class viewScript : MonoBehaviour {
 			camera.orthographicSize = currentViewSize;
 		
 		}
+        
 
 	}
 }
