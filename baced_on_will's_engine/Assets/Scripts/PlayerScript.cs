@@ -16,6 +16,7 @@ public class PlayerScript : MonoBehaviour {
 	public bool amFluttering = false;
 	public bool amDashing = false;
 	public bool flutteringHeld = false;
+    public bool usingPower = false;
 	public int beenDashing;
 	public int beenFluttering;
     public int jumpCooldown = 9;
@@ -25,6 +26,8 @@ public class PlayerScript : MonoBehaviour {
     public float speedLimit = 1.5f;
     public int health = 50;
     public int maxHealth = 50;
+    public int power = 20;
+    public int maxPower = 20;
     int facing;
     GraberScript graberScript;
     MovementControllerScript movementControllerScript;
@@ -65,6 +68,10 @@ public class PlayerScript : MonoBehaviour {
 			framesSinceLastDash++;
 		}
 		flutter();
+        if (power < maxPower)
+        {
+            power++;
+        }
 		Debug.Log (flutteringHeld);
 		Debug.Log (amFluttering);
         //speed = speed * 0.0000000007f; //this creates friction
@@ -86,22 +93,46 @@ public class PlayerScript : MonoBehaviour {
 
     public void left()
     {
-        //physicsScript.velocity.x = -speed;
-        if (physicsScript.velocity.x > -speedLimit)
+        if (usingPower == false)
         {
-            physicsScript.velocity.x = physicsScript.velocity.x - 0.025f;
-        }
-           
+            //physicsScript.velocity.x = -speed;
+            if (physicsScript.velocity.x > -speedLimit)
+            {
+                physicsScript.velocity.x = physicsScript.velocity.x - 0.025f;
+            }
+
             facing = -1;
+        } else
+        {
+            //physicsScript.velocity.x = -speed;
+            if (physicsScript.velocity.x > -speedLimit - 0.5)
+            {
+                physicsScript.velocity.x = physicsScript.velocity.x - 0.04f;
+            }
+
+            facing = -1;
+            power--;
+        }
     }
     public void right()
     {
-        //physicsScript.velocity.x = speed;
-        if (physicsScript.velocity.x < speedLimit)
+        if (usingPower == false)
         {
-            physicsScript.velocity.x = physicsScript.velocity.x + 0.025f;
-        }
+            //physicsScript.velocity.x = speed;
+            if (physicsScript.velocity.x < speedLimit)
+            {
+                physicsScript.velocity.x = physicsScript.velocity.x + 0.025f;
+            }
             facing = 1;
+        } else
+        {
+            //physicsScript.velocity.x = speed;
+            if (physicsScript.velocity.x < speedLimit + 0.5)
+            {
+                physicsScript.velocity.x = physicsScript.velocity.x + 0.04f;
+            }
+            facing = 1;
+        }
     }
 	public void dash()
 	{
@@ -114,7 +145,7 @@ public class PlayerScript : MonoBehaviour {
 			beenDashing = 0;
 		}
 	}
-	public void power()
+	public void activatePower()
 	{
 		
 	}

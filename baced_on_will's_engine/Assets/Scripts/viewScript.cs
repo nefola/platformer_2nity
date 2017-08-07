@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class viewScript : MonoBehaviour {
 
@@ -12,13 +13,16 @@ public class viewScript : MonoBehaviour {
 	PlayerScript playerScript;
 	public GameObject player;
     public GameObject menu;
-	public Camera camera;
+    public Camera camera;
+    public GameObject textGameObject;
+    Text text;
 	// Use this for initialization
 
 	void Start() {
 
 		playerScript = player.GetComponent<PlayerScript>();
 		physicsScript = player.GetComponent<PhysicsScript>();
+        text = textGameObject.GetComponent<Text>();
 		camera = GetComponent<Camera>();
 	}
 	
@@ -32,11 +36,11 @@ public class viewScript : MonoBehaviour {
 			lockCamera = false;
 		}
 		if (lockCamera == false) {
-			currentViewSize = restingViewSize * (vel + 1);
+			currentViewSize = restingViewSize * (vel * 1.5f + 1f);
 			camera.orthographicSize = currentViewSize;
 		
 		}
-        
+        text.text = (playerScript.health + "/" + playerScript.maxHealth + "\n" + playerScript.power + "/" + playerScript.maxPower);
 
 	}
 }

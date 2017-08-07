@@ -46,11 +46,12 @@ public class KeyboardInputScript : MonoBehaviour {
 				break;
 			}
 		}
+        playerScript.usingPower = false;
 		foreach (KeyCode code in powerKeys)
 		{
 			if (Input.GetKey(code))
 			{
-				playerScript.power();
+				playerScript.usingPower = true;
 				break;
 			}
 		}
