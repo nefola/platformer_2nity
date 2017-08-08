@@ -72,8 +72,8 @@ public class PlayerScript : MonoBehaviour {
         {
             power++;
         }
-		Debug.Log (flutteringHeld);
-		Debug.Log (amFluttering);
+		Debug.Log (usingPower);
+
         //speed = speed * 0.0000000007f; //this creates friction
     }
 
@@ -102,7 +102,7 @@ public class PlayerScript : MonoBehaviour {
             }
 
             facing = -1;
-        } else
+        } else if(power > 0)  
         {
             //physicsScript.velocity.x = -speed;
             if (physicsScript.velocity.x > -speedLimit - 0.5)
@@ -112,6 +112,7 @@ public class PlayerScript : MonoBehaviour {
 
             facing = -1;
             power--;
+            Debug.Log("running left");
         }
     }
     public void right()
@@ -124,7 +125,7 @@ public class PlayerScript : MonoBehaviour {
                 physicsScript.velocity.x = physicsScript.velocity.x + 0.025f;
             }
             facing = 1;
-        } else
+        } else if(power > 0)
         {
             //physicsScript.velocity.x = speed;
             if (physicsScript.velocity.x < speedLimit + 0.5)
@@ -132,6 +133,8 @@ public class PlayerScript : MonoBehaviour {
                 physicsScript.velocity.x = physicsScript.velocity.x + 0.04f;
             }
             facing = 1;
+            power--;
+            Debug.Log("running right");
         }
     }
 	public void dash()
@@ -169,12 +172,20 @@ public class PlayerScript : MonoBehaviour {
 	}
     public void jump()
     {
- if (jumps > 0 && framesSinceLastJump > jumpCooldown)
-        {
-            physicsScript.velocity.y = jumpVelocity;
-            framesSinceLastJump = 0;
-            jumps = jumps -1;
-        }
+        if (jumps > 0 && framesSinceLastJump > jumpCooldown)
+            if (usingPower == false)
+            {
+                {
+                    physicsScript.velocity.y = jumpVelocity;
+                    framesSinceLastJump = 0;
+                    jumps = jumps - 1;
+                }
+            } else if(power > 0)
+            {
+                physicsScript.velocity.y = jumpVelocity + 0.3f;
+                framesSinceLastJump = 0;
+                jumps = jumps - 1;
+            }
     }
     public void down()
     {

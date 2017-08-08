@@ -1,7 +1,7 @@
--add user interface
-	—add power
-		-add ground pound
-		-add power dash
-		-add power jump
-		-add power flutter
-	-add health and damage
+-polish user interface
+—add power
+	-add ground pound
+	-add power dash
+	-add power jump
+	-add power flutter
+-finish implementation of health
