@@ -3,5 +3,4 @@
 	-add ground pound
 	-add power dash
 	-add power jump
-	-add power flutter
 -finish implementation of health

@@ -11,6 +11,7 @@ public class PhysicsScript : MonoBehaviour {
     public Vector2 velocity;
     public bool onGround = false;
     public bool onCeiling = false;
+    public bool touchWall = false;
     public bool affectedByGravity = true;
 	public bool affectedByFriction = true;
     public float gravity;
@@ -34,6 +35,7 @@ public class PhysicsScript : MonoBehaviour {
         movementControllerScript.Move(velocity);
         onGround = checkIfGrounded();
         onCeiling = checkIfCeilinged();
+        touchWall = checkIfWalled();
 		if (affectedByFriction) {
 			if (onGround) {
 				velocity.y = 0;
@@ -46,11 +48,33 @@ public class PhysicsScript : MonoBehaviour {
         {
             velocity.y = 0;
         }
+        if (touchWall)
+        {
+            velocity.x = 0;
+        }
     }
 
     bool checkIfGrounded()
     {
         foreach (RaycastHit2D hit in movementControllerScript.collisionState.bottomHits)
+        {
+            if (hit.transform != null)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    bool checkIfWalled()
+    {
+        foreach (RaycastHit2D hit in movementControllerScript.collisionState.leftHits)
+        {
+            if (hit.transform != null)
+            {
+                return true;
+            }
+        }
+        foreach (RaycastHit2D hit in movementControllerScript.collisionState.rightHits)
         {
             if (hit.transform != null)
             {

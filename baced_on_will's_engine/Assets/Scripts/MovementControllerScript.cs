@@ -17,7 +17,6 @@ public class MovementControllerScript : MonoBehaviour {
     public List<GameObject> attachedObjects;
     public List<GameObject> passengers;
 
-
     public class CollisionState
     {
         public Vector2 bottomLeft;
@@ -221,6 +220,20 @@ public class MovementControllerScript : MonoBehaviour {
  
         return goodHit;
     }
+    float getSlopeAngle(float facing)
+    {
+        List<RaycastHit2D> bottomHits = VerticalRaycastHits(10);
+        if (facing == -1)
+        {
+            Vector2 origin = collisionState.bottomLeft;
+
+        } else if (facing == 1)
+        {
+            Vector2 origin = collisionState.bottomRight;
+        }
+
+            return 0;
+    }
 
     public Vector2 Move(Vector2 delta)
     {
@@ -239,6 +252,7 @@ public class MovementControllerScript : MonoBehaviour {
             Vector2 newDelta = new Vector2(delta.x, delta.y);
             if (delta.x != 0)
             {
+                float slopeAngle = getSlopeAngle(Mathf.Sign(delta.x));
                 UpdateCollisionState();
                 newDelta.x = CalculateMoveX(delta);
             }
@@ -362,5 +376,9 @@ public class MovementControllerScript : MonoBehaviour {
         gameObjectsToIgnoreCollisonsWith = gameObjectsToIgnoreCollisonsWith.Except<GameObject>(attachedObjects).ToList<GameObject>();
         transform.Translate(newDelta);
         return newDelta;
+    }
+    public void HandleSlope()
+    {
+     
     }
 }

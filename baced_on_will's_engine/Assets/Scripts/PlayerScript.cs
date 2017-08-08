@@ -102,7 +102,7 @@ public class PlayerScript : MonoBehaviour {
             }
 
             facing = -1;
-        } else if(power > 0)  
+        } else if(power >= 0)  
         {
             //physicsScript.velocity.x = -speed;
             if (physicsScript.velocity.x > -speedLimit - 0.5)
@@ -125,7 +125,7 @@ public class PlayerScript : MonoBehaviour {
                 physicsScript.velocity.x = physicsScript.velocity.x + 0.025f;
             }
             facing = 1;
-        } else if(power > 0)
+        } else if(power >= 0)
         {
             //physicsScript.velocity.x = speed;
             if (physicsScript.velocity.x < speedLimit + 0.5)
@@ -152,24 +152,52 @@ public class PlayerScript : MonoBehaviour {
 	{
 		
 	}
-	public void flutter()
-	{
-		if (physicsScript.onGround == false && flutteringHeld == true && flutters > 0) {
-			amFluttering = true;
-			flutters--;
-		}
-		if (amFluttering == true){
-		physicsScript.affectedByGravity = false;
-			beenFluttering++;
-			physicsScript.velocity.y = 0;
-			if (beenFluttering > 60 || flutteringHeld == false) {
-				amFluttering = false;
-				physicsScript.affectedByGravity = true;
-                beenFluttering = 0;
+    public void flutter()
+    {
+        if (usingPower == false)
+        {
+            if (physicsScript.onGround == false && flutteringHeld == true && flutters > 0)
+            {
+                amFluttering = true;
+                flutters--;
+            }
+            if (amFluttering == true)
+            {
+                physicsScript.affectedByGravity = false;
+                beenFluttering++;
+                physicsScript.velocity.y = 0;
+                if (beenFluttering > 30 || flutteringHeld == false)
+                {
+                    amFluttering = false;
+                    physicsScript.affectedByGravity = true;
+                    beenFluttering = 0;
 
-		} 
-	}
-	}
+                }
+            }
+        }
+        else if (power >= 0)
+        {
+            if (physicsScript.onGround == false && flutteringHeld == true && flutters > 0)
+            {
+                amFluttering = true;
+                flutters--;
+                power--;
+            }
+            if (amFluttering == true)
+            {
+                physicsScript.affectedByGravity = false;
+                beenFluttering++;
+                physicsScript.velocity.y = 0;
+                if (beenFluttering > 60 || flutteringHeld == false)
+                {
+                    amFluttering = false;
+                    physicsScript.affectedByGravity = true;
+                    beenFluttering = 0;
+
+                }
+            }
+        }
+    }
     public void jump()
     {
         if (jumps > 0 && framesSinceLastJump > jumpCooldown)
@@ -180,11 +208,12 @@ public class PlayerScript : MonoBehaviour {
                     framesSinceLastJump = 0;
                     jumps = jumps - 1;
                 }
-            } else if(power > 0)
+            } else if(power >= 0)
             {
                 physicsScript.velocity.y = jumpVelocity + 0.3f;
                 framesSinceLastJump = 0;
                 jumps = jumps - 1;
+                power--;
             }
     }
     public void down()
