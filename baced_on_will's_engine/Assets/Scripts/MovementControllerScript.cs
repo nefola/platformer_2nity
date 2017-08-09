@@ -160,7 +160,7 @@ public class MovementControllerScript : MonoBehaviour {
                 {
                     rayOrigin.y -= skinWidth;
                  }
-            horizontalHits.Add(ObstacleRaycast(rayOrigin, new Vector2(distance+skinWidth*direction, 0), Mathf.Abs(distance+skinWidth)));
+            horizontalHits.Add(ObstacleRaycast(rayOrigin, new Vector2(direction, 0), Mathf.Abs(distance)+skinWidth));
 
         }
         return horizontalHits;
@@ -222,7 +222,6 @@ public class MovementControllerScript : MonoBehaviour {
                 }
             }
         }
- 
         return goodHit;
     }
     float getSlopeAngle(float facing)
@@ -336,7 +335,7 @@ public class MovementControllerScript : MonoBehaviour {
                 }
             }
         }
-        return distance*direction;
+        return (distance-skinWidth)*direction;
     }
 
     public float CalculateMoveY(Vector2 delta)
