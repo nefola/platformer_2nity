@@ -139,9 +139,7 @@ public class PlayerScript : MonoBehaviour {
     }
 	public void dash()
 	{
-		Debug.Log("try dash");
 		if (framesSinceLastDash > dashCooldown && physicsScript.onGround) {
-			Debug.Log("dash!");
 			amDashing = true;
 			physicsScript.velocity.x = 1.6f * facing;
 			framesSinceLastDash = 0;

@@ -14,6 +14,7 @@ public class MovementControllerScript : MonoBehaviour {
     float horizontalRaySpacing;
     float verticalRaySpacing;
     public float skinWidth;
+    public float maxAscentAngle = 80;
     public List<GameObject> attachedObjects;
     public List<GameObject> passengers;
 
@@ -150,7 +151,7 @@ public class MovementControllerScript : MonoBehaviour {
             Vector2 corner = collisionState.getCorner(direction, -1);
             for (int i = 0; i < horizontalRayCount; i++)
             {
-                Vector2 rayOrigin = new Vector2(corner.x, horizontalRaySpacing * i + corner.y);
+                Vector2 rayOrigin = new Vector2(corner.x+skinWidth*direction*-1, horizontalRaySpacing * i + corner.y);
                 if (i == 0)
                 {
                     rayOrigin.y += skinWidth;
@@ -159,7 +160,7 @@ public class MovementControllerScript : MonoBehaviour {
                 {
                     rayOrigin.y -= skinWidth;
                  }
-            horizontalHits.Add(ObstacleRaycast(rayOrigin, new Vector2(distance, 0), Mathf.Abs(distance)));
+            horizontalHits.Add(ObstacleRaycast(rayOrigin, new Vector2(distance+skinWidth*direction, 0), Mathf.Abs(distance+skinWidth)));
 
         }
         return horizontalHits;
@@ -205,6 +206,7 @@ public class MovementControllerScript : MonoBehaviour {
     RaycastHit2D ObstacleRaycast(Vector2 origin, Vector2 direction, float distance) {
         RaycastHit2D goodHit = new RaycastHit2D();
         RaycastHit2D[] allHits = Physics2D.RaycastAll(origin, direction * distance, collisionLayer);
+        Debug.DrawRay(origin, direction * distance, Color.red);
         float checkDistance = distance;
         foreach (RaycastHit2D hit in allHits)
         {
@@ -212,8 +214,11 @@ public class MovementControllerScript : MonoBehaviour {
             {
                 if (hit.distance <= checkDistance && !gameObjectsToIgnoreCollisonsWith.Contains(hit.transform.gameObject))
                 {
-                    goodHit = hit;
-                    checkDistance = hit.distance;
+                    if (hit.transform != transform)
+                    {
+                        goodHit = hit;
+                        checkDistance = hit.distance;
+                    }
                 }
             }
         }
@@ -225,11 +230,41 @@ public class MovementControllerScript : MonoBehaviour {
         List<RaycastHit2D> bottomHits = VerticalRaycastHits(10);
         if (facing == -1)
         {
-            Vector2 origin = collisionState.bottomLeft;
+            List<RaycastHit2D> leftHits = HorizontalRaycastHits(-.01f);
+            RaycastHit2D bottomLeftHit = leftHits[0];
+            if (bottomLeftHit.transform != null)
+            {
+                if (gameObject.name == "Me")
+                {
+                    Debug.Log("hitting " + bottomLeftHit.collider.gameObject + ", normal " + bottomLeftHit.normal +", distance = " +bottomLeftHit.distance);
+                }
+                float slopeAngle = Vector2.Angle(bottomLeftHit.normal, Vector2.up);
+                return slopeAngle;
+                
+            }
+            else
+            {
 
-        } else if (facing == 1)
+            }
+        }
+        else if (facing == 1)
         {
-            Vector2 origin = collisionState.bottomRight;
+            List<RaycastHit2D> rightHits = HorizontalRaycastHits(.01f);
+            RaycastHit2D bottomRightHit = rightHits[0];
+            if (bottomRightHit.transform != null)
+            {
+                if (gameObject.name == "Me")
+                {
+                    Debug.Log("hitting " + bottomRightHit.collider.gameObject + ", normal " + bottomRightHit.normal);
+                }
+                float slopeAngle = Vector2.Angle(bottomRightHit.normal, Vector2.up);
+                return slopeAngle;
+                
+            }
+            else
+            {
+
+            }
         }
 
             return 0;
@@ -253,6 +288,7 @@ public class MovementControllerScript : MonoBehaviour {
             if (delta.x != 0)
             {
                 float slopeAngle = getSlopeAngle(Mathf.Sign(delta.x));
+//                Debug.Log(slopeAngle);
                 UpdateCollisionState();
                 newDelta.x = CalculateMoveX(delta);
             }
