@@ -11,6 +11,7 @@ public class PhysicsScript : MonoBehaviour {
     public Vector2 velocity;
     public bool onGround = false;
     public bool onCeiling = false;
+    public bool onslope = false;
     public bool touchWall = false;
     public bool affectedByGravity = true;
 	public bool affectedByFriction = true;
@@ -67,6 +68,10 @@ public class PhysicsScript : MonoBehaviour {
     }
     bool checkIfWalled()
     {
+        if(movementControllerScript.ascendingSlope == true)
+        {
+            return false;
+        }
         foreach (RaycastHit2D hit in movementControllerScript.collisionState.leftHits)
         {
             if (hit.transform != null)

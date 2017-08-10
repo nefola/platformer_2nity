@@ -11,6 +11,7 @@ public class MovementControllerScript : MonoBehaviour {
     public CollisionState collisionState;
     public int horizontalRayCount;
     public int verticalRayCount;
+    public bool ascendingSlope = false;
     float horizontalRaySpacing;
     float verticalRaySpacing;
     public float skinWidth;
@@ -233,10 +234,7 @@ public class MovementControllerScript : MonoBehaviour {
             RaycastHit2D bottomLeftHit = leftHits[0];
             if (bottomLeftHit.transform != null)
             {
-                if (gameObject.name == "Me")
-                {
-                    Debug.Log("hitting " + bottomLeftHit.collider.gameObject + ", normal " + bottomLeftHit.normal +", distance = " +bottomLeftHit.distance);
-                }
+               
                 float slopeAngle = Vector2.Angle(bottomLeftHit.normal, Vector2.up);
                 return slopeAngle;
                 
@@ -252,10 +250,8 @@ public class MovementControllerScript : MonoBehaviour {
             RaycastHit2D bottomRightHit = rightHits[0];
             if (bottomRightHit.transform != null)
             {
-                if (gameObject.name == "Me")
-                {
-                    Debug.Log("hitting " + bottomRightHit.collider.gameObject + ", normal " + bottomRightHit.normal);
-                }
+                
+           
                 float slopeAngle = Vector2.Angle(bottomRightHit.normal, Vector2.up);
                 return slopeAngle;
                 
@@ -287,7 +283,17 @@ public class MovementControllerScript : MonoBehaviour {
             if (delta.x != 0)
             {
                 float slopeAngle = getSlopeAngle(Mathf.Sign(delta.x));
-//                Debug.Log(slopeAngle);
+                if (slopeAngle < maxAscentAngle)
+                {
+                    float slopeY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(delta.x);
+                    Move(new Vector2(0, slopeY));
+                    Debug.Log(slopeAngle);
+                    ascendingSlope = true;
+                }
+                else
+                {
+                    ascendingSlope = false;
+                }
                 UpdateCollisionState();
                 newDelta.x = CalculateMoveX(delta);
             }
@@ -324,17 +330,20 @@ public class MovementControllerScript : MonoBehaviour {
             collisionState.rightHits = hits;
         }
 
-        float distance = Mathf.Abs(delta.x);
+        float distance = Mathf.Abs(delta.x)+skinWidth;
         foreach (RaycastHit2D hit in hits)
         {
             if (hit.transform != null)
             {
+                
                 if (hit.distance < distance)
                 {
                     distance = hit.distance;
                 }
+               
             }
         }
+
         return (distance-skinWidth)*direction;
     }
 
