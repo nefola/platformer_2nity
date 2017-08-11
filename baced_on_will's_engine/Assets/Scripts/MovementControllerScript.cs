@@ -12,6 +12,7 @@ public class MovementControllerScript : MonoBehaviour {
     public int horizontalRayCount;
     public int verticalRayCount;
     public bool ascendingSlope = false;
+    public bool decendingSlope = false;
     float horizontalRaySpacing;
     float verticalRaySpacing;
     public float skinWidth;
@@ -225,9 +226,9 @@ public class MovementControllerScript : MonoBehaviour {
         }
         return goodHit;
     }
-    float getSlopeAngle(float facing)
+    float getSlopeUpAngle(float facing)
     {
-        List<RaycastHit2D> bottomHits = VerticalRaycastHits(10);
+       // List<RaycastHit2D> bottomHits = VerticalRaycastHits(10);
         if (facing == -1)
         {
             List<RaycastHit2D> leftHits = HorizontalRaycastHits(-.01f);
@@ -264,6 +265,29 @@ public class MovementControllerScript : MonoBehaviour {
 
             return 0;
     }
+    float getSlopeDownAngle(float facing)
+    {
+        if(facing == -1)
+        {
+            List<RaycastHit2D> bottomHits = VerticalRaycastHits(-0.01f);
+            RaycastHit2D bottomrightHit = bottomHits[0];
+            if (bottomrightHit.transform != null)
+            {
+                float slopeAngle = Vector2.Angle(Vector2.left, bottomrightHit.normal);
+                return slopeAngle;
+            }
+        } else if(facing == 1)
+        {
+            List<RaycastHit2D> bottomHits = VerticalRaycastHits(-0.01f);
+            RaycastHit2D bottomLeftHit = bottomHits[0];
+            if (bottomLeftHit.transform != null)
+            {
+                float slopeAngle = Vector2.Angle(Vector2.right, bottomLeftHit.normal);
+                return slopeAngle;
+            }
+        }
+        return 0;
+    }
 
     public Vector2 Move(Vector2 delta)
     {
@@ -282,24 +306,39 @@ public class MovementControllerScript : MonoBehaviour {
             Vector2 newDelta = new Vector2(delta.x, delta.y);
             if (delta.x != 0)
             {
-                float slopeAngle = getSlopeAngle(Mathf.Sign(delta.x));
+                float slopeAngle = getSlopeUpAngle(Mathf.Sign(delta.x));
                 if (slopeAngle < maxAscentAngle)
                 {
                     float slopeY = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * Mathf.Abs(delta.x);
                     Move(new Vector2(0, slopeY));
-                    Debug.Log(slopeAngle);
+                    Debug.Log("up is" + slopeAngle);
                     ascendingSlope = true;
                 }
+
                 else
                 {
                     ascendingSlope = false;
                 }
+                
+               
                 UpdateCollisionState();
                 newDelta.x = CalculateMoveX(delta);
             }
             transform.Translate(new Vector2(newDelta.x,0));
             if (delta.y != 0)
             {
+                float slopeAngle = getSlopeDownAngle(Mathf.Tan(delta.y));
+                if (delta.y != 0)
+                {
+                    float slopeX = Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * (delta.y);
+                    Move(new Vector2(slopeX, 0));
+                    Debug.Log("down is" + slopeAngle);
+                    decendingSlope = true;
+                }
+                else
+                {
+                    decendingSlope = false;
+                }
                 UpdateCollisionState();
                 newDelta.y = CalculateMoveY(delta);
             }
