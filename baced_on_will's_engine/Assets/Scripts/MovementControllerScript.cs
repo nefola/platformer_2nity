@@ -330,13 +330,13 @@ public class MovementControllerScript : MonoBehaviour {
                 float slopeAngle = getSlopeDownAngle(Mathf.Tan(delta.y));
                 if (delta.y != 0)
                 {
-                    float slopeX = Mathf.Tan(slopeAngle * Mathf.Deg2Rad) * (delta.y);
-                    Move(new Vector2(slopeX, 0));
+                    float slopeX = Mathf.Sin(slopeAngle * Mathf.Deg2Rad) * (delta.y);
+                    Move(new Vector2(-slopeX, 0));
                     Debug.Log("down is" + slopeAngle);
                     decendingSlope = true;
                 }
                 else
-                {
+                { 
                     decendingSlope = false;
                 }
                 UpdateCollisionState();
